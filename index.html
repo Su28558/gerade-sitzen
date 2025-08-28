@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kopfneigung-Warner</title>
+<style>
+  body {
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    text-align: center;
+    background-color: #f0f0f0;
+  }
+  h1 {
+    color: #333;
+  }
+  p {
+    font-size: 1.2em;
+  }
+</style>
+</head>
+<body>
+
+<h1>Kopfneigung-Warner</h1>
+<p>Halte dein Gerät gerade. Ein Ton ertönt, wenn du zu schief sitzt.</p>
+<button id="startButton">Sensor aktivieren</button>
+
+<audio id="alertSound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
+
+<script>
+const button = document.getElementById('startButton');
+const audio = document.getElementById('alertSound');
+
+button.addEventListener('click', () => {
+    // DeviceOrientation Events starten
+    if (window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', handleOrientation);
+        button.style.display = 'none';
+        alert("Sensor aktiviert! Kippe deinen Kopf, um den Ton zu hören.");
+    } else {
+        alert("Dein Gerät unterstützt keine DeviceOrientation API.");
+    }
+});
+
+function handleOrientation(event) {
+    // Roll: seitliche Neigung (links/rechts)
+    let roll = event.gamma; // -90 bis 90
+    let pitch = event.beta; // -180 bis 180
+
+    // Schwellenwert für Warnung (in Grad)
+    const rollThreshold = 20; 
+    const pitchThreshold = 20;
+
+    if (Math.abs(roll) > rollThreshold || Math.abs(pitch) > pitchThreshold) {
+        if (audio.paused) {
+            audio.play();
+        }
+    } else {
+        audio.pause();
+        audio.currentTime = 0;
+    }
+}
+</script>
+
+</body>
+</html>
